@@ -13,15 +13,16 @@ class BaseModel extends Model
     protected $updatedField   = 'updated_at';
     protected $deletedField   = 'deleted_at';
 
-    private static bool $walSet = false;
+    private static bool $pragmasSet = false;
 
     public function __construct()
     {
         parent::__construct();
 
-        if (! self::$walSet) {
+        if (! self::$pragmasSet) {
             $this->db->query('PRAGMA journal_mode=WAL');
-            self::$walSet = true;
+            $this->db->query('PRAGMA foreign_keys=ON');
+            self::$pragmasSet = true;
         }
     }
 

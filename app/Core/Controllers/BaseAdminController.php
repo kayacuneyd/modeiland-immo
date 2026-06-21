@@ -21,16 +21,6 @@ class BaseAdminController extends Controller
         helper(['url', 'form', 'cekirdek']);
 
         $this->auth = new AuthService();
-        $this->guard();
-    }
-
-    protected function guard(): void
-    {
-        if (! $this->auth->check()) {
-            session()->set('redirect_after_login', current_url());
-            header('Location: ' . site_url('admin/login'));
-            exit;
-        }
     }
 
     protected function requirePermission(string $permission): void

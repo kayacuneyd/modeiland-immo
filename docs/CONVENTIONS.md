@@ -23,7 +23,8 @@
 - Namespace: `App\Modules\Blog\Models\PostModel`
 
 ### Controller'lar
-- **Çoğul + Controller**: `BlogController`, `PagesController`, `ContactController`
+- **Modül adı + Controller**: `BlogController`, `PagesController`, `ContactController`
+  - Public controller modül adını taşır (tekil veya çoğul — modül adına bağlı): `Blog` → `BlogController`, `Pages` → `PagesController`
 - Admin: `BlogAdminController` → `app/Modules/Blog/Controllers/Admin/`
 - Core: `AdminDashboardController` → `app/Core/Controllers/`
 
@@ -107,5 +108,13 @@ $db->table('settings')->where('key', 'site.title')->get(); // ❌
 1. `app/Modules/MyModule/` klasörünü oluştur
 2. `Pages` veya `Blog` modülünü şablon al, isimler değiştir
 3. Migration'ı `app/Modules/MyModule/Database/Migrations/` altına yaz
-4. `app/Config/Routes.php`'e `require_once` satırını ekle
-5. Pages modülü her zaman en son kalır (catch-all slug)
+4. **`app/Config/Autoload.php`'e namespace ekle** (migration discovery için ZORUNLU):
+   ```php
+   'App\Modules\MyModule' => APPPATH . 'Modules/MyModule/',
+   ```
+5. **`composer.json` `autoload.psr-4`'e ekle** (optimize-autoloader için):
+   ```json
+   "App\\Modules\\MyModule\\": "app/Modules/MyModule/"
+   ```
+6. `app/Config/Routes.php`'e `require_once` satırını ekle (Pages'ten önce)
+7. Pages modülü her zaman en son kalır (catch-all slug)

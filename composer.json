@@ -1,6 +1,6 @@
 {
-    "name": "codeigniter4/appstarter",
-    "description": "CodeIgniter4 starter app",
+    "name": "cekirdekcms/cekirdekcms",
+    "description": "Yeniden kullanılabilir CodeIgniter 4 CMS çekirdeği",
     "license": "MIT",
     "type": "project",
     "homepage": "https://codeigniter.com",
@@ -21,7 +21,12 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Config\\": "app/Config/"
+            "Config\\": "app/Config/",
+            "App\\Core\\": "app/Core/",
+            "App\\Modules\\": "app/Modules/",
+            "App\\Modules\\Pages\\": "app/Modules/Pages/",
+            "App\\Modules\\Blog\\": "app/Modules/Blog/",
+            "App\\Modules\\Contact\\": "app/Modules/Contact/"
         },
         "exclude-from-classmap": [
             "**/Database/Migrations/**"

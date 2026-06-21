@@ -2,9 +2,9 @@
 
 namespace App\Modules\Contact\Models;
 
-use CodeIgniter\Model;
+use App\Core\Models\BaseModel;
 
-class ContactMessageModel extends Model
+class ContactMessageModel extends BaseModel
 {
     protected $table         = 'contact_messages';
     protected $useTimestamps = true;

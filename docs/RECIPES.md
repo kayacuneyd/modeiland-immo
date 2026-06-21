@@ -12,18 +12,24 @@ Sonra:
 1. `app/Modules/Products/` içindeki tüm dosyalarda `Blog` → `Products`, `Post` → `Product`, `posts` → `products` yap
 2. Migration dosyasını düzenle (tablo adı, alanlar)
 3. Numarayı güncelle: `2024-01-01-000050_CreateProductsTable.php`
-4. `app/Config/Autoload.php`'deki `$psr4` dizisine modül namespace'ini ekle (migration discovery için zorunlu):
+4. **`app/Config/Autoload.php`**'deki `$psr4` dizisine ekle (CI4 migration discovery):
 ```php
 'App\Modules\Products' => APPPATH . 'Modules/Products/',
 ```
-5. `app/Config/Routes.php`'e ekle (`Pages`'in require satırından **önce**):
+5. **`composer.json`** `autoload.psr-4`'e ekle (optimize-autoloader):
+```json
+"App\\Modules\\Products\\": "app/Modules/Products/"
+```
+Sonra: `composer dump-autoload`
+
+6. `app/Config/Routes.php`'e ekle (`Pages`'in require satırından **önce**):
 
 ```php
 require_once APPPATH . 'Modules/Products/Config/Routes.php';
 ```
 
-6. `php spark migrate --all` çalıştır
-7. Admin layout sidebar'a nav item ekle (`app/Views/admin/layout.php`)
+7. `php spark migrate --all` çalıştır
+8. Admin layout sidebar'a nav item ekle (`app/Views/admin/layout.php`)
 
 ---
 

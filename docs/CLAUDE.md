@@ -76,10 +76,14 @@ class MyApiController extends BaseApiController {
 ### Route ekleme
 
 ```php
-// 1. app/Config/Autoload.php'e namespace ekle (migration discovery için ZORUNLU):
+// 1. app/Config/Autoload.php'e namespace ekle (CI4 migration discovery için ZORUNLU):
 'App\Modules\MyModule' => APPPATH . 'Modules/MyModule/',
 
-// 2. app/Config/Routes.php'de require et:
+// 2. composer.json autoload.psr-4'e ekle (optimize-autoloader için ZORUNLU):
+// "App\\Modules\\MyModule\\": "app/Modules/MyModule/"
+// → ardından: composer dump-autoload
+
+// 3. app/Config/Routes.php'de require et (Pages'ten önce):
 require_once APPPATH . 'Modules/MyModule/Config/Routes.php';
 // Pages modülü EN SON gelir (catch-all slug içeriyor)
 ```

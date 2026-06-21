@@ -17,15 +17,28 @@ class Setup extends BaseCommand
         CLI::newLine();
 
         // 1. .env kontrolü
+        $envCreated = false;
         if (! file_exists(ROOTPATH . '.env')) {
             if (file_exists(ROOTPATH . '.env.example')) {
                 copy(ROOTPATH . '.env.example', ROOTPATH . '.env');
                 CLI::write('✓ .env oluşturuldu (.env.example kopyalandı)', 'green');
+                $envCreated = true;
             } else {
                 CLI::write('⚠ .env.example bulunamadı. .env manuel oluşturun.', 'yellow');
             }
         } else {
             CLI::write('✓ .env zaten mevcut', 'green');
+        }
+
+        // 1b. Encryption key üret (eksikse)
+        $envPath = ROOTPATH . '.env';
+        if (file_exists($envPath)) {
+            $envContent = file_get_contents($envPath);
+            if (str_contains($envContent, 'encryption.key =') &&
+                ! preg_match('/^encryption\.key\s*=\s*.+$/m', $envContent)) {
+                $this->call('key:generate');
+                CLI::write('✓ Encryption key üretildi', 'green');
+            }
         }
 
         // 2. Database dizini
