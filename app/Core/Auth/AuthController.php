@@ -46,7 +46,7 @@ class AuthController extends BaseWebController
             return redirect()->back()->withInput()->with('error', lang('Auth.login_failed'));
         }
 
-        $redirectTo = session()->get('redirect_after_login') ?: site_url('admin/dashboard');
+        $redirectTo = $this->safeAdminRedirect(session()->get('redirect_after_login'));
         session()->remove('redirect_after_login');
 
         return redirect()->to($redirectTo);
@@ -57,5 +57,16 @@ class AuthController extends BaseWebController
         $this->auth->logout();
 
         return redirect()->to(site_url('admin/login'))->with('success', lang('Auth.logout_success'));
+    }
+
+    private function safeAdminRedirect(mixed $redirectTo): string
+    {
+        if (! is_string($redirectTo) || $redirectTo === '') {
+            return site_url('admin/dashboard');
+        }
+
+        return str_starts_with($redirectTo, site_url('admin'))
+            ? $redirectTo
+            : site_url('admin/dashboard');
     }
 }

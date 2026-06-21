@@ -41,10 +41,18 @@ class Autoload extends AutoloadConfig
         APP_NAMESPACE         => APPPATH,
         'App\Core'            => APPPATH . 'Core/',
         'App\Modules'         => APPPATH . 'Modules/',
-        'App\Modules\Pages'   => APPPATH . 'Modules/Pages/',
-        'App\Modules\Blog'    => APPPATH . 'Modules/Blog/',
-        'App\Modules\Contact' => APPPATH . 'Modules/Contact/',
     ];
+
+    public function __construct()
+    {
+        foreach (glob(APPPATH . 'Modules/*', GLOB_ONLYDIR) ?: [] as $moduleDir) {
+            $moduleName = basename($moduleDir);
+
+            $this->psr4['App\Modules\\' . $moduleName] = $moduleDir . '/';
+        }
+
+        parent::__construct();
+    }
 
     /**
      * -------------------------------------------------------------------

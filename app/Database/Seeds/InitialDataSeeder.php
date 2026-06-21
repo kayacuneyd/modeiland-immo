@@ -11,9 +11,8 @@ class InitialDataSeeder extends Seeder
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // Roller
-        $db->table('roles')->truncate();
-        $db->table('roles')->insertBatch([
+        // Roller: mevcut role/user iliskilerini bozmamak icin truncate edilmez.
+        $roles = [
             [
                 'name'        => 'Admin',
                 'slug'        => 'admin',
@@ -28,7 +27,22 @@ class InitialDataSeeder extends Seeder
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
-        ]);
+        ];
+
+        foreach ($roles as $role) {
+            $exists = $db->table('roles')->where('slug', $role['slug'])->countAllResults();
+            if ($exists) {
+                $db->table('roles')
+                    ->where('slug', $role['slug'])
+                    ->update([
+                        'name'        => $role['name'],
+                        'permissions' => $role['permissions'],
+                        'updated_at'  => $role['updated_at'],
+                    ]);
+            } else {
+                $db->table('roles')->insert($role);
+            }
+        }
 
         // Varsayılan ayarlar
         $settings = [
@@ -74,6 +88,8 @@ class InitialDataSeeder extends Seeder
             throw new \RuntimeException('InitialDataSeeder başarısız oldu.');
         }
 
-        echo "Roller ve varsayılan ayarlar eklendi.\n";
+        if (is_cli() && ENVIRONMENT !== 'testing') {
+            echo "Roller ve varsayılan ayarlar hazır.\n";
+        }
     }
 }

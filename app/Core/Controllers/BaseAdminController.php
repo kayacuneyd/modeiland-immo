@@ -3,6 +3,7 @@
 namespace App\Core\Controllers;
 
 use App\Core\Auth\AuthService;
+use App\Core\Modules\ModuleRegistry;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -26,6 +27,7 @@ class BaseAdminController extends Controller
     protected function requirePermission(string $permission): void
     {
         if (! $this->auth->can($permission)) {
+            $this->response->setStatusCode(403);
             echo $this->render('admin/errors/403', ['message' => lang('Common.forbidden')]);
             exit;
         }
@@ -34,6 +36,7 @@ class BaseAdminController extends Controller
     protected function render(string $view, array $data = []): string
     {
         $data['adminUser'] = $this->auth->user();
+        $data['adminNav']  = ModuleRegistry::adminNav($this->auth);
         $data['content']   = view($view, $data);
 
         return view('admin/layout', $data);

@@ -12,24 +12,25 @@ Sonra:
 1. `app/Modules/Products/` içindeki tüm dosyalarda `Blog` → `Products`, `Post` → `Product`, `posts` → `products` yap
 2. Migration dosyasını düzenle (tablo adı, alanlar)
 3. Numarayı güncelle: `2024-01-01-000050_CreateProductsTable.php`
-4. **`app/Config/Autoload.php`**'deki `$psr4` dizisine ekle (CI4 migration discovery):
-```php
-'App\Modules\Products' => APPPATH . 'Modules/Products/',
-```
-5. **`composer.json`** `autoload.psr-4`'e ekle (optimize-autoloader):
+4. `app/Modules/Products/module.json` oluştur:
 ```json
-"App\\Modules\\Products\\": "app/Modules/Products/"
+{
+  "name": "Products",
+  "slug": "products",
+  "enabled": true,
+  "routes": "Config/Routes.php",
+  "routePriority": 40,
+  "adminMenu": {
+    "label": "Products",
+    "url": "admin/products",
+    "icon": "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+    "order": 40
+  }
+}
 ```
-Sonra: `composer dump-autoload`
+5. `php spark migrate --all` çalıştır
 
-6. `app/Config/Routes.php`'e ekle (`Pages`'in require satırından **önce**):
-
-```php
-require_once APPPATH . 'Modules/Products/Config/Routes.php';
-```
-
-7. `php spark migrate --all` çalıştır
-8. Admin layout sidebar'a nav item ekle (`app/Views/admin/layout.php`)
+Merkezi `app/Config/Routes.php`, `app/Config/Autoload.php`, `composer.json` ve `app/Views/admin/layout.php` dosyalarına normal modül ekleme sırasında dokunma. Route ve sidebar keşfi `module.json` üzerinden otomatik yapılır.
 
 ---
 

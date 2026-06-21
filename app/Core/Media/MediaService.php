@@ -77,6 +77,7 @@ class MediaService
         $row = $db->table('media')->where('id', $id)->get()->getRowArray();
 
         if ($row) {
+            $this->deleteFiles($row);
             $db->table('media')->where('id', $id)->update(['deleted_at' => date('Y-m-d H:i:s')]);
         }
     }
@@ -146,6 +147,35 @@ class MediaService
             }
         } catch (\Throwable) {
             // Thumbnail oluşturma başarısız olursa sessizce devam et
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function deleteFiles(array $row): void
+    {
+        $relativePath = ltrim((string) ($row['path'] ?? ''), '/');
+        if ($relativePath === '' || str_contains($relativePath, '..')) {
+            return;
+        }
+
+        $paths = [FCPATH . $relativePath];
+        $info  = pathinfo($relativePath);
+        $uuid  = pathinfo((string) ($row['filename'] ?? $info['basename'] ?? ''), PATHINFO_FILENAME);
+        $ext   = $info['extension'] ?? '';
+        $dir   = $info['dirname'] ?? '';
+
+        if ($uuid !== '' && $ext !== '' && $dir !== '') {
+            foreach (array_keys(self::SIZES) as $size) {
+                $paths[] = FCPATH . $dir . '/' . $uuid . '-' . $size . '.' . $ext;
+            }
+        }
+
+        foreach ($paths as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            }
         }
     }
 }

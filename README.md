@@ -8,7 +8,7 @@ Yeniden kullanılabilir CodeIgniter 4 + SQLite CMS çekirdeği. Her yeni müşte
 
 ## Gereksinimler
 
-- PHP 8.1+
+- PHP 8.2+
 - SQLite3 PHP extension (`php-sqlite3`)
 - Composer
 - Node.js (yalnızca yerel CSS derlemesi için — sunucuda gerekmez)
@@ -36,7 +36,7 @@ php spark setup
 `php spark setup` şunları yapar:
 - `.env` oluşturur
 - Migration'ları çalıştırır (tüm tablolar oluşur)
-- Varsayılan rolleri ve ayarları seed eder
+- Varsayılan rolleri ve ayarları idempotent seed eder
 - Admin kullanıcısı oluşturur (soran form)
 
 ---
@@ -92,8 +92,10 @@ Varsayılan rotalar:
 
 1. `Blog` modülünü kopyala → yeniden adlandır
 2. Migration + model + controller + view + routes
-3. `app/Config/Routes.php`'e require satırı ekle
+3. `module.json` içindeki `routes`, `routePriority` ve `adminMenu` alanlarını düzenle
 4. `php spark migrate --all`
+
+Merkezi `Routes.php`, `Autoload.php`, `composer.json` veya admin layout dosyasına yeni modül için dokunma. Modül manifest'i route ve sidebar keşfi için yeterlidir.
 
 ---
 
@@ -119,3 +121,5 @@ Detay: `docs/RECIPES.md` → Bölüm 6
 | `docs/CONVENTIONS.md` | Kodlama kuralları, isimlendirme |
 | `docs/UI-KIT.md` | Renk token'ları, component listesi ve kullanımı |
 | `docs/RECIPES.md` | Adım adım reçeteler |
+| `AGENTS.md` | Ajanlar için kısa başlangıç dosyası |
+| `PROJECT_SPEC.md` | Proje hedefi ve operasyon sözleşmesi |

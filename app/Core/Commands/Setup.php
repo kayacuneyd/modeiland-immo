@@ -82,12 +82,18 @@ class Setup extends BaseCommand
                 return;
             }
 
+            $adminRole = $db->table('roles')->where('slug', 'admin')->get()->getRowArray();
+            if (! $adminRole) {
+                CLI::error('Admin rolü bulunamadı. InitialDataSeeder sonucunu kontrol edin.');
+                return;
+            }
+
             $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
             $db->table('users')->insert([
                 'name'          => $name,
                 'email'         => $email,
                 'password_hash' => $hash,
-                'role_id'       => 1,
+                'role_id'       => $adminRole['id'],
                 'is_active'     => 1,
                 'created_at'    => date('Y-m-d H:i:s'),
                 'updated_at'    => date('Y-m-d H:i:s'),

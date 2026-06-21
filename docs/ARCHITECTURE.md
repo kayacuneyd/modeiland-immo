@@ -35,6 +35,8 @@ cekirdekcms/
 │   │   │   └── MediaService.php          upload, resize, library
 │   │   ├── Mail/
 │   │   │   └── MailService.php           SMTP mail gönderme
+│   │   ├── Modules/
+│   │   │   └── ModuleRegistry.php        module.json discovery
 │   │   ├── Config/
 │   │   │   └── Routes.php               core rotalar
 │   │   └── Commands/
@@ -140,6 +142,7 @@ Her modül kendi klasörünün içinde self-contained:
 
 ```
 app/Modules/MyModule/
+├── module.json
 ├── Config/Routes.php
 ├── Controllers/
 │   ├── MyController.php         (extends BaseWebController)
@@ -155,4 +158,24 @@ app/Modules/MyModule/
         └── edit.php
 ```
 
-Modülü silmek = klasörü silmek + `app/Config/Routes.php`'den require satırını kaldırmak.
+`module.json`, route dosyası ve admin menü kaydını tanımlar:
+
+```json
+{
+  "name": "MyModule",
+  "slug": "mymodule",
+  "enabled": true,
+  "routes": "Config/Routes.php",
+  "routePriority": 50,
+  "adminMenu": {
+    "label": "My Module",
+    "url": "admin/my-module",
+    "icon": "M4 6h16M4 12h16M4 18h16",
+    "order": 50
+  }
+}
+```
+
+Admin menüde düz metin için `label`, dil dosyası anahtarı için `labelKey` kullanılır.
+
+Modülü silmek = klasörü silmek. Merkezi route, autoload, composer veya admin layout dosyasında normalde ek kayıt yoktur.

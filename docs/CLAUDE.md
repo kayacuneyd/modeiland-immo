@@ -9,7 +9,7 @@ Kod yazmadan önce bu dosyayı oku. Diğer `docs/` dosyalarını gerektiğinde o
 
 | Katman      | Teknoloji                                      |
 |-------------|------------------------------------------------|
-| Backend     | CodeIgniter 4 (PHP 8.1+)                       |
+| Backend     | CodeIgniter 4 (PHP 8.2+)                       |
 | Veritabanı  | SQLite3 (`writable/database/cekirdek.db`)      |
 | Frontend    | Tailwind CSS v3 + DaisyUI v4                   |
 | CSS build   | `npm run build` → `public/css/style.css`       |
@@ -73,20 +73,11 @@ class MyApiController extends BaseApiController {
 }
 ```
 
-### Route ekleme
+### Modül ve route ekleme
 
-```php
-// 1. app/Config/Autoload.php'e namespace ekle (CI4 migration discovery için ZORUNLU):
-'App\Modules\MyModule' => APPPATH . 'Modules/MyModule/',
+Her modül `app/Modules/MyModule/module.json` dosyasıyla keşfedilir. Normal yeni modül eklerken `app/Config/Routes.php`, `app/Config/Autoload.php`, `composer.json` veya admin layout değiştirme.
 
-// 2. composer.json autoload.psr-4'e ekle (optimize-autoloader için ZORUNLU):
-// "App\\Modules\\MyModule\\": "app/Modules/MyModule/"
-// → ardından: composer dump-autoload
-
-// 3. app/Config/Routes.php'de require et (Pages'ten önce):
-require_once APPPATH . 'Modules/MyModule/Config/Routes.php';
-// Pages modülü EN SON gelir (catch-all slug içeriyor)
-```
+`routePriority` küçükten büyüğe yüklenir. Catch-all route içeren Pages modülü gibi modüller yüksek öncelik değeriyle en sona bırakılır.
 
 ### Migration
 
