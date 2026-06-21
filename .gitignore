@@ -1,0 +1,39 @@
+# Bağımlılıklar
+/vendor/
+/node_modules/
+
+# Ortam dosyası
+/.env
+
+# SQLite veritabanı (sunucuda ayrı tutulur)
+/writable/database/*.db
+/writable/database/*.db-wal
+/writable/database/*.db-shm
+
+# Çalışma dizini (CI4 runtime)
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/temp/*
+/writable/backups/*
+
+# .gitkeep dosyaları dahil edilir
+!/writable/database/.gitkeep
+!/writable/backups/.gitkeep
+!/writable/cache/.gitkeep
+!/writable/logs/.gitkeep
+
+# Medya yüklemeleri
+/public/uploads/*
+!/public/uploads/.htaccess
+!/public/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.idea/
+
+# public/css/style.css dahil edilir (shared hosting deploy için gerekli)

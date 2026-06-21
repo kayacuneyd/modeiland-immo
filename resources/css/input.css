@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Layout yardımcıları */
+  .ck-container {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .ck-section {
+    @apply py-16 md:py-24;
+  }
+
+  /* Buton varyantları */
+  .ck-btn-primary {
+    @apply btn btn-primary rounded-full px-8;
+  }
+
+  .ck-btn-accent {
+    @apply btn btn-accent rounded-full px-8;
+  }
+
+  .ck-btn-ghost {
+    @apply btn btn-ghost rounded-full px-8;
+  }
+
+  /* Kart */
+  .ck-card {
+    @apply card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Admin sidebar nav item */
+  .ck-nav-item {
+    @apply flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium
+           text-base-content/70 hover:bg-base-200 hover:text-base-content
+           transition-colors duration-150;
+  }
+
+  .ck-nav-item.active {
+    @apply bg-primary/10 text-primary font-semibold;
+  }
+
+  /* Form alanları */
+  .ck-label {
+    @apply label-text font-medium text-base-content;
+  }
+
+  .ck-input {
+    @apply input input-bordered w-full bg-base-100 focus:input-primary;
+  }
+
+  .ck-textarea {
+    @apply textarea textarea-bordered w-full bg-base-100 focus:textarea-primary;
+  }
+
+  /* Tablo */
+  .ck-table {
+    @apply table table-zebra w-full;
+  }
+
+  /* Badge */
+  .ck-badge-published {
+    @apply badge badge-success badge-sm;
+  }
+
+  .ck-badge-draft {
+    @apply badge badge-warning badge-sm;
+  }
+}

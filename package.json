@@ -1,0 +1,14 @@
+{
+  "name": "cekirdekcms",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.js -i ./resources/css/input.css -o ./public/css/style.css --minify",
+    "watch": "tailwindcss -c tailwind.config.js -i ./resources/css/input.css -o ./public/css/style.css --watch",
+    "dev": "tailwindcss -c tailwind.config.js -i ./resources/css/input.css -o ./public/css/style.css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17",
+    "daisyui": "^4.12.0"
+  }
+}
