@@ -37,6 +37,11 @@ class Estate extends BaseConfig
     public string $stripeWebhookSecret  = '';
     public string $stripeSeekerPriceId  = '';  // recurring price ID from Stripe dashboard
 
+    // Cloudflare Images (Faz 4)
+    public string $cloudflareAccountId      = '';
+    public string $cloudflareImagesToken    = '';
+    public string $cloudflareImagesDelivery = '';  // e.g. https://imagedelivery.net/{account_hash}
+
     public function __construct()
     {
         parent::__construct();
@@ -60,5 +65,9 @@ class Estate extends BaseConfig
         $this->stripePublishableKey = env('STRIPE_PUBLISHABLE_KEY', '');
         $this->stripeWebhookSecret  = env('STRIPE_WEBHOOK_SECRET', '');
         $this->stripeSeekerPriceId  = env('STRIPE_SEEKER_PRICE_ID', '');
+
+        $this->cloudflareAccountId      = env('CLOUDFLARE_ACCOUNT_ID', '');
+        $this->cloudflareImagesToken    = env('CLOUDFLARE_IMAGES_TOKEN', '');
+        $this->cloudflareImagesDelivery = env('CLOUDFLARE_IMAGES_DELIVERY_URL', '');
     }
 }

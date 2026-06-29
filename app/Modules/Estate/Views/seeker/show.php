@@ -1,9 +1,18 @@
 <?php
-/** @var array $listing @var array $images */
+/**
+ * @var array      $listing
+ * @var array      $images
+ * @var array|null $fitResult   null|{score:int, reason:string}
+ * @var bool       $canApply    seeker is logged in + has active subscription
+ */
+use App\Modules\Estate\Models\ListingImageModel;
+
 $w = $listing['warmmiete']   ? number_format($listing['warmmiete']   / 100, 0, ',', '.') . ' €' : null;
 $k = $listing['kaltmiete']   ? number_format($listing['kaltmiete']   / 100, 0, ',', '.') . ' €' : null;
 $n = $listing['nebenkosten'] ? number_format($listing['nebenkosten'] / 100, 0, ',', '.') . ' €' : null;
 $d = $listing['deposit']     ? number_format($listing['deposit']     / 100, 0, ',', '.') . ' €' : null;
+
+$imageCount = count($images);
 ?>
 <div data-theme="modeiland" class="min-h-screen bg-base-100">
 
@@ -24,19 +33,71 @@ $d = $listing['deposit']     ? number_format($listing['deposit']     / 100, 0, '
       <div class="alert alert-success"><span><?= esc(session('success')) ?></span></div>
     <?php endif ?>
 
-    <!-- Gallery -->
-    <div class="rounded-xl overflow-hidden bg-base-200 aspect-video flex items-center justify-center">
-      <?php if (! empty($images)): ?>
-        <img src="<?= esc($images[0]['path']) ?>" alt="Foto" class="object-cover w-full h-full">
-      <?php else: ?>
-        <div class="text-slate-400 text-sm p-6 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4-4a3 3 0 014 0l4 4M14 12l2-2a3 3 0 014 0l2 2"/>
-          </svg>
-          Noch keine Fotos verfügbar
-        </div>
+    <!-- Fit score badge (shown when seeker has active search preferences) -->
+    <?php if (! empty($fitResult)): ?>
+    <div class="alert bg-success/10 border border-success/30 text-sm py-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <span class="font-semibold text-success"><?= (int) $fitResult['score'] ?> % Übereinstimmung</span>
+        <?php if (! empty($fitResult['reason'])): ?>
+          <span class="text-slate-500 ml-2">— <?= esc($fitResult['reason']) ?></span>
+        <?php endif ?>
+      </div>
+    </div>
+    <?php endif ?>
+
+    <!-- Image gallery -->
+    <?php if ($imageCount > 0): ?>
+    <div>
+      <!-- Main image -->
+      <div class="rounded-xl overflow-hidden bg-base-200 aspect-video relative" id="gallery-main">
+        <img id="gallery-main-img"
+             src="<?= esc(ListingImageModel::displayUrl($images[0])) ?>"
+             alt="Foto 1 von <?= esc($listing['location_approx'] ?? 'Inserat') ?>"
+             class="object-cover w-full h-full"
+             loading="eager">
+        <?php if ($imageCount > 1): ?>
+          <button onclick="galleryPrev()" aria-label="Vorheriges Foto"
+                  class="absolute left-2 top-1/2 -translate-y-1/2 btn btn-circle btn-sm bg-black/40 border-0 text-white hover:bg-black/60">‹</button>
+          <button onclick="galleryNext()" aria-label="Nächstes Foto"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-circle btn-sm bg-black/40 border-0 text-white hover:bg-black/60">›</button>
+          <span class="absolute bottom-2 right-3 text-white text-xs bg-black/50 rounded px-2 py-0.5">
+            <span id="gallery-current">1</span> / <?= $imageCount ?>
+          </span>
+        <?php endif ?>
+      </div>
+
+      <!-- Thumbnail strip -->
+      <?php if ($imageCount > 1): ?>
+      <div class="flex gap-2 mt-2 overflow-x-auto pb-1" role="list" aria-label="Galerie Vorschaubilder">
+        <?php foreach ($images as $i => $img): ?>
+        <button onclick="galleryGoto(<?= $i ?>)"
+                id="gallery-thumb-<?= $i ?>"
+                role="listitem"
+                aria-label="Foto <?= $i + 1 ?>"
+                class="shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 <?= $i === 0 ? 'border-primary' : 'border-transparent' ?> focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary transition-all">
+          <img src="<?= esc(ListingImageModel::displayUrl($img)) ?>"
+               alt="Vorschau <?= $i + 1 ?>"
+               class="object-cover w-full h-full"
+               loading="lazy">
+        </button>
+        <?php endforeach ?>
+      </div>
       <?php endif ?>
     </div>
+
+    <?php else: ?>
+    <div class="rounded-xl overflow-hidden bg-base-200 aspect-video flex items-center justify-center">
+      <div class="text-slate-400 text-sm p-6 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4-4a3 3 0 014 0l4 4M14 12l2-2a3 3 0 014 0l2 2"/>
+        </svg>
+        Noch keine Fotos verfügbar
+      </div>
+    </div>
+    <?php endif ?>
 
     <!-- Location header -->
     <div>
@@ -49,7 +110,7 @@ $d = $listing['deposit']     ? number_format($listing['deposit']     / 100, 0, '
       </p>
     </div>
 
-    <!-- Fact strip (künye şeridi) -->
+    <!-- Fact strip -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <?php
       $facts = [
@@ -94,20 +155,30 @@ $d = $listing['deposit']     ? number_format($listing['deposit']     / 100, 0, '
       </span>
     </div>
 
-    <!-- CTA — contact -->
+    <!-- CTA — contact + Bewerbungspaket -->
     <div class="card bg-primary text-primary-content shadow-lg">
-      <div class="card-body items-center text-center py-8">
-        <h2 class="card-title text-xl">Interesse? Nachricht senden</h2>
+      <div class="card-body items-center text-center py-8 gap-3">
+        <h2 class="card-title text-xl">Interesse? Jetzt handeln</h2>
         <p class="text-primary-content/70 text-sm max-w-xs">
           Direktkontakt — ohne Makler, ohne Umwege.
-          <?php if (! session()->get('estate_seeker_id')): ?>
-          Kostenlos registrieren und sofort loslegen.
-          <?php endif ?>
         </p>
-        <a href="<?= site_url("inserate/{$listing['id']}/kontakt") ?>"
-           class="btn btn-accent mt-2 min-h-[44px] px-8">
-          Anbieter kontaktieren
-        </a>
+        <div class="flex flex-wrap justify-center gap-3 mt-1">
+          <a href="<?= site_url("inserate/{$listing['id']}/kontakt") ?>"
+             class="btn btn-accent min-h-[44px] px-6">
+            Anbieter kontaktieren
+          </a>
+          <?php if ($canApply ?? false): ?>
+            <a href="<?= site_url("inserate/{$listing['id']}/bewerben") ?>"
+               class="btn btn-outline border-primary-content/40 text-primary-content hover:bg-primary-content/10 min-h-[44px] px-6">
+              Bewerbungspaket erstellen
+            </a>
+          <?php else: ?>
+            <a href="<?= site_url('abonnieren') ?>"
+               class="btn btn-ghost border-primary-content/20 text-primary-content/70 min-h-[44px] px-4 text-sm">
+              Plus: Bewerbungsunterlagen
+            </a>
+          <?php endif ?>
+        </div>
       </div>
     </div>
 
@@ -120,3 +191,39 @@ $d = $listing['deposit']     ? number_format($listing['deposit']     / 100, 0, '
   </footer>
 
 </div>
+
+<?php if ($imageCount > 1): ?>
+<script>
+(function () {
+  var images = <?= json_encode(array_map(
+    fn($img) => ListingImageModel::displayUrl($img),
+    $images
+  )) ?>;
+  var current = 0;
+
+  function galleryGoto(idx) {
+    current = idx;
+    document.getElementById('gallery-main-img').src = images[idx];
+    document.getElementById('gallery-main-img').alt = 'Foto ' + (idx + 1);
+    document.getElementById('gallery-current').textContent = idx + 1;
+    images.forEach(function (_, i) {
+      var thumb = document.getElementById('gallery-thumb-' + i);
+      if (thumb) {
+        thumb.classList.toggle('border-primary', i === idx);
+        thumb.classList.toggle('border-transparent', i !== idx);
+      }
+    });
+  }
+
+  window.galleryNext = function () { galleryGoto((current + 1) % images.length); };
+  window.galleryPrev = function () { galleryGoto((current - 1 + images.length) % images.length); };
+  window.galleryGoto = galleryGoto;
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') galleryNext();
+    if (e.key === 'ArrowLeft')  galleryPrev();
+  });
+})();
+</script>
+<?php endif ?>
