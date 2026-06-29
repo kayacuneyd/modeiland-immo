@@ -4,6 +4,7 @@ export default {
     './app/Views/**/*.php',
     './app/Modules/**/*.php',
     './app/Core/Controllers/**/*.php',
+    './resources/**/*.php',
   ],
   plugins: [require('daisyui')],
   daisyui: {
@@ -29,6 +30,31 @@ export default {
           'warning':          '#F59E0B',
           'warning-content':  '#1B2D42',
           'error':            '#EF4444',
+          'error-content':    '#ffffff',
+        },
+      },
+      {
+        // modeiland — Estate module theme (navy/amber/cream palette from blueprint)
+        modeiland: {
+          'primary':          '#1B2A4A',  // navy
+          'primary-content':  '#F6F1E7',  // cream
+          'secondary':        '#44506B',  // slate
+          'secondary-content':'#F6F1E7',
+          'accent':           '#C7841A',  // amber
+          'accent-content':   '#ffffff',
+          'neutral':          '#44506B',
+          'neutral-content':  '#F6F1E7',
+          'base-100':         '#F6F1E7',  // cream
+          'base-200':         '#EDE7DA',
+          'base-300':         '#DDD7CA',
+          'base-content':     '#1B2A4A',
+          'info':             '#3B82F6',
+          'info-content':     '#ffffff',
+          'success':          '#2F6B4F',  // success green
+          'success-content':  '#ffffff',
+          'warning':          '#C7841A',
+          'warning-content':  '#1B2A4A',
+          'error':            '#9B2C2C',  // danger
           'error-content':    '#ffffff',
         },
       },

@@ -1,0 +1,13 @@
+{
+    "name": "Estate",
+    "slug": "estate",
+    "enabled": true,
+    "routes": "Config/Routes.php",
+    "routePriority": 10,
+    "adminMenu": {
+        "labelKey": "Estate.nav_estate",
+        "url": "admin/estate",
+        "icon": "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z",
+        "order": 10
+    }
+}
