@@ -102,6 +102,14 @@ $routes->post('seeker/suche/speichern',           '\App\Modules\Estate\Controlle
 $routes->post('seeker/suche/(:num)/loeschen',     '\App\Modules\Estate\Controllers\Seeker\SavedSearchController::delete/$1');
 $routes->post('seeker/suche/(:num)/alarm',        '\App\Modules\Estate\Controllers\Seeker\SavedSearchController::toggleAlert/$1');
 
+// Seeker profile (Faz 4)
+$routes->get('seeker/profil',   '\App\Modules\Estate\Controllers\Seeker\SeekerProfileController::index');
+$routes->post('seeker/profil',  '\App\Modules\Estate\Controllers\Seeker\SeekerProfileController::update');
+
+// AI Bewerbungspaket (Faz 4)
+$routes->get('inserate/(:num)/bewerben',     '\App\Modules\Estate\Controllers\Seeker\ApplicationController::show/$1');
+$routes->post('inserate/(:num)/bewerben/neu','\App\Modules\Estate\Controllers\Seeker\ApplicationController::regenerate/$1');
+
 // ─── Legal routes ─────────────────────────────────────────────────────────────
 $routes->get('impressum',            '\App\Modules\Estate\Controllers\Legal\LegalController::impressum');
 $routes->get('datenschutz',          '\App\Modules\Estate\Controllers\Legal\LegalController::datenschutz');

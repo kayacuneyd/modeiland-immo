@@ -24,6 +24,7 @@ $isTrial   = $subscription && $subscription['status'] === 'trial';
         <?php else: ?>
           <span id="seeker-unread-badge" class="badge badge-accent font-mono hidden"></span>
         <?php endif ?>
+        <a href="<?= site_url('seeker/profil') ?>" class="link link-hover text-primary-content/60 text-xs">Profil</a>
         <a href="<?= site_url('seeker/logout') ?>" class="link link-hover text-primary-content/60 text-xs">Abmelden</a>
       </div>
     </div>

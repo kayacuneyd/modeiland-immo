@@ -41,6 +41,23 @@ class AiService
         };
     }
 
+    /**
+     * Send a free-form prompt and return the raw text response.
+     * Used by AiMatchingService and AiBewerbungService for short, targeted calls.
+     * Throws \RuntimeException on hard failure; caller should catch.
+     */
+    public function rawPrompt(string $prompt, int $maxTokens = 200): string
+    {
+        if (empty($this->config->aiApiKey)) {
+            throw new \RuntimeException('AI_API_KEY not configured');
+        }
+
+        return match ($this->config->aiProvider) {
+            'anthropic' => $this->rawAnthropic($prompt, $maxTokens),
+            default     => $this->rawOpenAi($prompt, $maxTokens),
+        };
+    }
+
     // ─── Private helpers ────────────────────────────────────────────────
 
     private function buildPrompt(string $rawText, ?string $sourceUrl): string
@@ -150,6 +167,72 @@ class AiService
         }
 
         return $this->parseJsonResponse($text);
+    }
+
+    private function rawOpenAi(string $prompt, int $maxTokens): string
+    {
+        $payload = json_encode([
+            'model'       => $this->config->aiModel,
+            'messages'    => [['role' => 'user', 'content' => $prompt]],
+            'temperature' => 0.5,
+            'max_tokens'  => $maxTokens,
+        ]);
+
+        $ch = curl_init('https://api.openai.com/v1/chat/completions');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $this->config->aiApiKey,
+            ],
+        ]);
+
+        $raw   = curl_exec($ch);
+        $errno = curl_errno($ch);
+        curl_close($ch);
+
+        if ($errno || $raw === false) {
+            throw new \RuntimeException('OpenAI request failed');
+        }
+
+        $resp = json_decode($raw, true);
+        return trim($resp['choices'][0]['message']['content'] ?? '');
+    }
+
+    private function rawAnthropic(string $prompt, int $maxTokens): string
+    {
+        $payload = json_encode([
+            'model'      => $this->config->aiModel ?: 'claude-haiku-4-5-20251001',
+            'max_tokens' => $maxTokens,
+            'messages'   => [['role' => 'user', 'content' => $prompt]],
+        ]);
+
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'x-api-key: ' . $this->config->aiApiKey,
+                'anthropic-version: 2023-06-01',
+            ],
+        ]);
+
+        $raw   = curl_exec($ch);
+        $errno = curl_errno($ch);
+        curl_close($ch);
+
+        if ($errno || $raw === false) {
+            throw new \RuntimeException('Anthropic request failed');
+        }
+
+        $resp = json_decode($raw, true);
+        return trim($resp['content'][0]['text'] ?? '');
     }
 
     private function parseJsonResponse(string $text): array

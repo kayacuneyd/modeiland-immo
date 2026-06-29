@@ -83,7 +83,56 @@ Panel → sensible Aktion (Entfernen)?
 
 ---
 
-## Kurulum (Faz 1 + 2 + 3)
+## Faz 4 — Cloudflare Images, AI Eşleştirme & Bewerbungspaket (implementiert)
+
+### Cloudflare Images
+
+Fotoğraflar ilk yüklemede sunucuda `writable/uploads/` altına kaydedilir.
+Cron, onaylı fotoğrafları CF Images API'sine aktarır ve `listing_images.cf_url` günceller.
+`cf_url` henüz yoksa görünüm otomatik olarak yerel yola döner — cron çalışana kadar sorun olmaz.
+
+**Kurulum:**
+
+1. Cloudflare Dashboard → Images → API token oluştur (Images:Edit izni)
+2. `.env`'e kopyala:
+   ```
+   CLOUDFLARE_ACCOUNT_ID        = <32-char-hex>
+   CLOUDFLARE_IMAGES_TOKEN      = <token>
+   CLOUDFLARE_IMAGES_DELIVERY_URL = https://imagedelivery.net/<hash>
+   ```
+3. Hostinger Scheduled Tasks → her 10 dakikada bir:
+   ```
+   php /home/<user>/public_html/spark estate:upload-images
+   ```
+
+> **Not:** CF Images sadece `approved_photos` consent kaydı olan ilanlar için aktif edilir (GDPR).
+> CF Images olmadan (env boş) platform tam çalışır — fotoğraflar yerel URL ile sunulur.
+
+### AI Fit Score Eşleştirme
+
+- Kural tabanlı, saf PHP — gerçek zamanlı embedding yok (paylaşımlı hosting kısıtı).
+- Puan hesaplama: Warmmiete 35p + Zimmer 25p + m² 20p + Ort 15p + Typ 5p = max 100.
+- Puan ≥ 40 ise AI (GPT-4o-mini / Claude Haiku) kısa bir Almanca açıklama üretir.
+- **Maliyet kısıtı:** AI açıklaması `match_reasons` tablosunda `(listing_id, filters_hash)` çifti başına 7 gün önbelleğe alınır — tekrar çağrı yapılmaz.
+- Puanlar arama sonuçlarında badge olarak gösterilir; ilan detay sayfasında açıklama metniyle birlikte.
+
+### AI Bewerbungspaket
+
+- Seeker, `/inserate/{id}/bewerben` sayfasında Almanca Anschreiben + belge checklist alır.
+- AI çağrısı `application_drafts` tablosunda `(seeker_id, listing_id)` başına 30 gün önbelleğe alınır.
+- "Neu generieren" butonu önbelleği temizleyip yeni çağrı yapar (token maliyeti seeker'ın tercihi).
+- Seeker profili eksikse (`/seeker/profil`) fallback metin döner — asla hata sayfası çıkmaz.
+- **Hukuki not:** Oluşturulan metin AI çıktısıdır, hukuki bağlayıcılığı yoktur. Kullanıcıya gösterim sırasında açıkça belirtilir ("kein Rechtsrat").
+
+### Yeni Cron Komutu
+
+| Komut | Amaç | Sıklık |
+|---|---|---|
+| `php spark estate:upload-images` | Onaylı fotoğrafları CF Images API'sine aktar | Her 10 dk |
+
+---
+
+## Kurulum (Faz 1 + 2 + 3 + 4)
 
 ```bash
 # 1. Composer bağımlılıkları
@@ -124,6 +173,9 @@ php spark serve
 | `STRIPE_PUBLISHABLE_KEY` | — | Stripe yayın anahtarı (pk_live_...) |
 | `STRIPE_WEBHOOK_SECRET` | — | Webhook imza anahtarı (whsec_...) |
 | `STRIPE_SEEKER_PRICE_ID` | — | Stripe recurring price ID (5€/ay) |
+| `CLOUDFLARE_ACCOUNT_ID` | — | CF account hash (Faz 4) |
+| `CLOUDFLARE_IMAGES_TOKEN` | — | CF Images API token (Faz 4) |
+| `CLOUDFLARE_IMAGES_DELIVERY_URL` | — | CF delivery base URL (Faz 4) |
 
 ### Cron Tanımları (Hostinger Scheduled Tasks)
 
@@ -137,6 +189,9 @@ php spark serve
 # Seeker arama alarmları — yeni ilanları e-posta ile bildir (günlük, sabah + akşam)
 0 7 * * * /usr/bin/php /home/user/domains/example.com/spark estate:send-search-alerts
 0 18 * * * /usr/bin/php /home/user/domains/example.com/spark estate:send-search-alerts
+
+# Onaylı fotoğrafları Cloudflare Images'a aktar (Faz 4 — CF env dolu ise aktif)
+*/10 * * * * /usr/bin/php /home/user/domains/example.com/spark estate:upload-images
 ```
 
 > **Not:** Hostinger'da `spark` dosyasının tam yolunu kullanın. `public_html` üst dizininde bulunur.
